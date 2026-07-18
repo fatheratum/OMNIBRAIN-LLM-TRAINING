@@ -1,0 +1,32 @@
+name: Train OmniBrain LLM
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Run Training
+        run: python3 scripts/pretrain.py --epochs 1
+
+      - name: Upload checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-checkpoint
+          path: checkpoints/
+          retention-days: 90
